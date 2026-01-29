@@ -1,4 +1,11 @@
-logs/
+# Build artifacts
+build/
 *.exe
 *.obj
 *.pdb
+
+# Runtime logs
+logs/
+
+# AI assistant artifacts
+Claude/
