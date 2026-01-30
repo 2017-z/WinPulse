@@ -46,18 +46,37 @@ namespace WinPulse::Core {
         m_collectors.push_back(std::move(collector));
     }
 
+
+    void Engine::configure(int intervalMs, int durationSec) {
+        m_intervalMs = intervalMs;
+        m_durationSec = durationSec;
+    }
+
     void Engine::run() {
         std::cout << "=== WinPulse MVP v0.1 (Refactored) ===" << std::endl;
         std::cout << "Monitoring initialized..." << std::endl;
         std::cout << "Log: " << m_logPath << std::endl;
         std::cout << "Press Ctrl+C to stop\n" << std::endl;
 
+        auto startTime = std::chrono::steady_clock::now();
+
         // 预热延时，让 CPU 计算有初始差值
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         while (m_running) {
             tick();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            if (m_durationSec > 0) {
+                auto now = std::chrono::steady_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
+                if (elapsed >= m_durationSec) {
+                    std::cout << "\n[Info] Duration limit reached (" << m_durationSec << "s). Stopping..." << std::endl;
+                    break;
+                }
+            }
+
+            //使用培植的间隔时间
+            std::this_thread::sleep_for(std::chrono::milliseconds(m_intervalMs));
         }
     }
 

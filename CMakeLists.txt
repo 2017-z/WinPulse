@@ -22,4 +22,4 @@ add_executable(WinPulse ${SOURCES})
 target_link_libraries(WinPulse PRIVATE Psapi)
 
 # 新增了 Pdh 库用于磁盘性能计数器
-target_link_libraries(WinPulse PRIVATE Psapi Pdh) 
+target_link_libraries(WinPulse PRIVATE Psapi Pdh)

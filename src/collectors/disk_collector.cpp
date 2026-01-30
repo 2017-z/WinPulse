@@ -10,7 +10,7 @@
 
 namespace WinPulse::Collectors {
 
-    DiskCollector::DiskCollector() {
+    DiskCollector::DiskCollector(const std::string& filter) : m_filter(filter) {
         initPdh();
     }
 
@@ -77,25 +77,42 @@ namespace WinPulse::Collectors {
             if (start != std::string::npos && end != std::string::npos && end > start) {
                 std::string instanceName = fullPath.substr(start + 1, end - start - 1);
 
-                // 过滤掉 _Total
-                if (instanceName != "_Total") {
+                bool passFilter = true;
+
+                if (instanceName == "_Total") {
+                    passFilter = false;
+                }
+
+                // 2. 用户过滤：如果用户指定了 filter (如 "C:")，必须包含该字符串才算通过
+                if (!m_filter.empty()) {
+                    // find 返回 npos 表示没找到
+                    if (instanceName.find(m_filter) == std::string::npos) {
+                        passFilter = false;
+                    }
+                }
+
+                if (passFilter) {
                     DiskUnit unit;
                     unit.name = instanceName; 
 
-                    // 构造精确路径 (使用 English Counter)
                     std::string readPath = "\\PhysicalDisk(" + instanceName + ")\\Disk Read Bytes/sec";
                     std::string writePath = "\\PhysicalDisk(" + instanceName + ")\\Disk Write Bytes/sec";
 
                     PDH_STATUS s1 = PdhAddEnglishCounterA(m_queryHandle, readPath.c_str(), 0, &unit.hRead);
                     PDH_STATUS s2 = PdhAddEnglishCounterA(m_queryHandle, writePath.c_str(), 0, &unit.hWrite);
 
+                    // 只有读写两个计数器都添加成功，才算这一路监控建立成功
                     if (s1 == ERROR_SUCCESS && s2 == ERROR_SUCCESS) {
                         m_disks.push_back(unit);
+                    } else {
+                        // 如果只成功了一个，最好把它移除，防止僵尸计数器占用资源
+                        if (s1 == ERROR_SUCCESS) PdhRemoveCounter(unit.hRead);
+                        if (s2 == ERROR_SUCCESS) PdhRemoveCounter(unit.hWrite);
                     }
                 }
             }
             
-            // 移动到下一个字符串（以 \0 分隔）
+            // 移动指针到下一个字符串
             currentPath += fullPath.length() + 1;
         }
     }

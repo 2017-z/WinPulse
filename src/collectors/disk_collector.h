@@ -18,7 +18,11 @@ namespace WinPulse::Collectors {
 
     class DiskCollector : public ICollector {
     public:
-        DiskCollector();
+        // DiskCollector();
+        // ~DiskCollector() override;
+
+        //增加了filter参数
+        explicit DiskCollector(const std::string& filter = ""); 
         ~DiskCollector() override;
 
         [[nodiscard]] std::string getName() const override { return "Disk"; }
@@ -36,5 +40,7 @@ namespace WinPulse::Collectors {
         
         // 新增辅助函数：利用通配符自动发现磁盘
         void discoverDisks();
+
+        std::string m_filter;
     };
 }

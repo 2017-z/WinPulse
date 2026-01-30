@@ -11,6 +11,8 @@ namespace WinPulse::Core {
         Engine();
         ~Engine(); // RAII: 析构时自动关闭文件
 
+        void configure(int intervalMs, int durationSec);
+
         // 注册采集器 (依赖注入)
         void addCollector(std::unique_ptr<Collectors::ICollector> collector);
         
@@ -27,6 +29,9 @@ namespace WinPulse::Core {
         std::ofstream m_logFile;
         const std::string m_logDir = "logs";
         std::string m_logPath;    
+
+        int m_intervalMs = 1000;
+        int m_durationSec = 0;
     };
 
 }
