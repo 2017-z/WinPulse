@@ -24,14 +24,23 @@ namespace WinPulse::Core {
             std::filesystem::create_directory(m_logDir);
         }
 
-        m_logFile.open(m_logPath, std::ios::app);
+        // 1. 获取文件名安全的时间戳
+        std::string timeStr = Utils::GetFileSafeTimestamp();
+        
+        // 2. 拼接完整路径: logs/winpulse_2026-01-30_22-10-00.log
+        m_logPath = m_logDir + "/winpulse_" + timeStr + ".log";
+
+        // 3. 打开文件
+        m_logFile.open(m_logPath); // 默认就是覆盖模式，因为文件名是新的
+
         if (!m_logFile) {
-            std::cerr << "Fatal Error: Failed to open log file!" << std::endl;
+            std::cerr << "Fatal Error: Failed to open log file: " << m_logPath << std::endl;
             exit(1);
         }
 
-        m_logFile << "\n=== Started " << Utils::GetCurrentTimestamp() << " ===" << std::endl;
+        m_logFile << "=== WinPulse Session Started at " << Utils::GetCurrentTimestamp() << " ===" << std::endl;
     }
+    
 
     void Engine::addCollector(std::unique_ptr<Collectors::ICollector> collector) {
         m_collectors.push_back(std::move(collector));

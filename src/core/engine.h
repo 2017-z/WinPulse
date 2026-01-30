@@ -26,7 +26,7 @@ namespace WinPulse::Core {
         
         std::ofstream m_logFile;
         const std::string m_logDir = "logs";
-        const std::string m_logPath = "logs/winpulse.log";
+        std::string m_logPath;    
     };
 
 }
