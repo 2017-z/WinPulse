@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "collectors/i_collector.h"
 #include <vector>
 #include <string>

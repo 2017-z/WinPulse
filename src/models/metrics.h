@@ -14,4 +14,9 @@ namespace WinPulse::Models {
         size_t availMB;
     };
 
+    struct DiskMetric {
+        double readKBps;  // 每秒读取 (KB)
+        double writeKBps; // 每秒写入 (KB)
+    };
+
 } // namespace WinPulse::Models
