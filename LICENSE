@@ -30,8 +30,3 @@
   ...
 
   17. Accepting the License.
-
-  You can also include the following short SPDX identifier at the top of
-  your files:
-
-  SPDX-License-Identifier: GPL-3.0-or-later
