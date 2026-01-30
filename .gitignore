@@ -9,3 +9,5 @@ logs/
 
 # AI assistant artifacts
 Claude/
+
+.vscode/

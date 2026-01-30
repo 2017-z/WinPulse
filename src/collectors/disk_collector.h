@@ -1,32 +1,40 @@
 ﻿#pragma once
 #include "collectors/i_collector.h"
-#include "models/metrics.h"
 #include <windows.h>
 #include <pdh.h>
-#include <pdhmsg.h>
+#include <vector>
+#include <string>
 
 namespace WinPulse::Collectors {
+
+    // 定义单个磁盘的上下文
+    struct DiskUnit {
+        std::string name;           // 磁盘名称，如 "0 C:"
+        PDH_HCOUNTER hRead = NULL;  // 读计数器句柄
+        PDH_HCOUNTER hWrite = NULL; // 写计数器句柄
+        double readKBps = 0.0;      // 当前读速率
+        double writeKBps = 0.0;     // 当前写速率
+    };
 
     class DiskCollector : public ICollector {
     public:
         DiskCollector();
-        ~DiskCollector() override; // 需要析构函数释放 PDH 句柄
+        ~DiskCollector() override;
 
         [[nodiscard]] std::string getName() const override { return "Disk"; }
         void collect() override;
         [[nodiscard]] std::string getFormattedOutput() const override;
 
     private:
-        Models::DiskMetric m_data{};
-
-        // PDH 相关的句柄
         PDH_HQUERY m_queryHandle = NULL;
-        PDH_HCOUNTER m_readCounter = NULL;
-        PDH_HCOUNTER m_writeCounter = NULL;
-        
         bool m_isInitialized = false;
 
-        // 内部初始化函数
+        // 存储所有探测到的物理磁盘
+        std::vector<DiskUnit> m_disks;
+
         void initPdh();
+        
+        // 新增辅助函数：利用通配符自动发现磁盘
+        void discoverDisks();
     };
-} // namespace WinPulse::Collectors
+}
