@@ -10,6 +10,11 @@ if(MSVC)
 endif() 
 # 强制使用UTF-8编码，否则会中文注释会乱码，改注释太麻烦了
 
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+#静态链接
+
 # 自动扫描源文件 (工程化实践)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
