@@ -4,6 +4,7 @@
 #include "collectors/mem_collector.h"
 #include "collectors/process_collector.h"
 #include "collectors/disk_collector.h"
+#include "core/analyzer.h"
 #include <memory>
 #include <iostream>
 
@@ -36,6 +37,14 @@ int main(int argc, char* argv[]) {
 
     // 4. 运行
     engine.run();
+
+    if (!engine.getLogPath().empty()) {
+        Core::LogAnalyzer::analyze(engine.getLogPath());
+    }
+
+    // 保持窗口打开一会儿 (可选，方便用户看报告)
+    std::cout << "\nPress Enter to exit..." << std::endl;
+    std::cin.get();
 
     return 0;
 }

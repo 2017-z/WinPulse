@@ -19,6 +19,9 @@ namespace WinPulse::Core {
         // 启动主循环
         void run();
 
+        // 获取当前日志路径
+        [[nodiscard]] std::string getLogPath() const { return m_logPath; }
+
     private:
         void initWorkspace();
         void tick();

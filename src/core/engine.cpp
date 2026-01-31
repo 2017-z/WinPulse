@@ -78,6 +78,11 @@ namespace WinPulse::Core {
             //使用培植的间隔时间
             std::this_thread::sleep_for(std::chrono::milliseconds(m_intervalMs));
         }
+
+        if (m_logFile.is_open()) {
+            m_logFile << "=== Stopped " << Utils::GetCurrentTimestamp() << " ===" << std::endl;
+            m_logFile.close(); // 关闭文件以释放文件句柄，否则实测 Analyzer 无法读取和写入
+        }
     }
 
     void Engine::tick() {
