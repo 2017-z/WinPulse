@@ -7,10 +7,34 @@
 #include "core/analyzer.h"
 #include <memory>
 #include <iostream>
+#include <windows.h>
+#include <thread>
+#include <chrono>
 
+
+// 注册一个全局的Handlr，避免程序被ctrl+c强制kill时无法正常退出
+static WinPulse::Core::Engine* g_engine = nullptr;
+
+// 信号处理
+BOOL WINAPI ConsoleHandler(DWORD signal) {
+    if (signal == CTRL_C_EVENT || signal == CTRL_CLOSE_EVENT) {
+        std::cout << "\n[Info] Stopping WinPulse safely..." << std::endl;
+        if (g_engine) {
+            g_engine->stop();
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
 int main(int argc, char* argv[]) {
     using namespace WinPulse;
 
+
+    // 注册信号处理
+    if (!SetConsoleCtrlHandler(ConsoleHandler, TRUE)) {
+        std::cerr << "Error: Could not set control handler" << std::endl;
+        return 1;
+    }
     // 1. 解析配置
     Core::Settings settings;
     if (!Core::Config::parse(argc, argv, settings)) {
@@ -19,6 +43,8 @@ int main(int argc, char* argv[]) {
 
     // 2. 初始化引擎
     Core::Engine engine;
+
+    g_engine = &engine;// quanju指针
     engine.configure(settings.intervalMs, settings.durationSec);
 
     // 3. 组装采集器 (将配置参数注入)
@@ -39,10 +65,13 @@ int main(int argc, char* argv[]) {
     engine.run();
 
     if (!engine.getLogPath().empty()) {
+        // 等待文件锁被释放，这是一个保险措施
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         Core::LogAnalyzer::analyze(engine.getLogPath());
     }
 
-    // 保持窗口打开一会儿 (可选，方便用户看报告)
+    g_engine = nullptr; // 清理全局指针
+
     std::cout << "\nPress Enter to exit..." << std::endl;
     std::cin.get();
 

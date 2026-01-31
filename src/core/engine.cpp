@@ -53,7 +53,7 @@ namespace WinPulse::Core {
     }
 
     void Engine::run() {
-        std::cout << "=== WinPulse MVP v0.1 (Refactored) ===" << std::endl;
+        std::cout << "=== WinPulse v0.1.0 ===" << std::endl;
         std::cout << "Monitoring initialized..." << std::endl;
         std::cout << "Log: " << m_logPath << std::endl;
         std::cout << "Press Ctrl+C to stop\n" << std::endl;
@@ -70,8 +70,8 @@ namespace WinPulse::Core {
                 auto now = std::chrono::steady_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
                 if (elapsed >= m_durationSec) {
-                    std::cout << "\n[Info] Duration limit reached (" << m_durationSec << "s). Stopping..." << std::endl;
-                    break;
+                    std::cout << "\n[Info] Duration limit reached. Stopping..." << std::endl;
+                    stop();
                 }
             }
 
@@ -85,6 +85,11 @@ namespace WinPulse::Core {
         }
     }
 
+
+    void Engine::stop() {
+        m_running = false;
+    }
+    //xinznegle stop 实现
     void Engine::tick() {
         std::string logLine = "[" + Utils::GetCurrentTimestamp() + "] ";
 

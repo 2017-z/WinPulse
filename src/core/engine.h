@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 #include <fstream>
+#include <atomic>
+#include <string>
 #include "collectors/i_collector.h"
 
 namespace WinPulse::Core {
@@ -19,6 +21,9 @@ namespace WinPulse::Core {
         // 启动主循环
         void run();
 
+        // 新增停止入口，stop方法给外部调用
+        void stop();
+
         // 获取当前日志路径
         [[nodiscard]] std::string getLogPath() const { return m_logPath; }
 
@@ -26,7 +31,8 @@ namespace WinPulse::Core {
         void initWorkspace();
         void tick();
 
-        bool m_running;
+        //bool m_running;
+        std::atomic<bool> m_running;// 防止多线程竞争
         std::vector<std::unique_ptr<Collectors::ICollector>> m_collectors;
         
         std::ofstream m_logFile;
